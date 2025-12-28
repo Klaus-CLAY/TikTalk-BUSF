@@ -8,12 +8,16 @@
     // ============================================
     // ⚠️ MANUAL CONFIGURATION - UPDATE THIS! ⚠️
     // ============================================
-    // Get your server URL from Render Dashboard:
-    // 1. Go to Render Dashboard → "TikTalk-Server" service
-    // 2. Copy the URL shown at the top
-    // 3. Paste it below (replace the placeholder)
-    // Leave empty to use auto-detection
-    const MANUAL_SERVER_URL = ''; // ✅ Set your Render server URL here (e.g., 'https://tiktalk-server-mlqd.onrender.com')
+    // To get your server URL:
+    // 1. Go to Render Dashboard: https://dashboard.render.com
+    // 2. Click on "TikTalk-Server" service
+    // 3. Copy the URL shown at the top (e.g., https://tiktalk-server-abc123.onrender.com)
+    // 4. Paste it below (replace the empty string)
+    // 
+    // Leave empty ('') to use auto-detection (may not work if URLs have different suffixes)
+    // ============================================
+    const MANUAL_SERVER_URL = ''; // ✅ Paste your Render server URL here
+    // Example: 'https://tiktalk-server-abc123.onrender.com'
     // ============================================
     
     // Local development
@@ -32,13 +36,19 @@
             
             // Try to auto-detect based on common patterns
             if (frontendUrl.includes('tiktalk-busf')) {
-                serverUrl = frontendUrl.replace(/tiktalk-busf/i, 'tiktalk-server');
+                // Replace tiktalk-busf with tiktalk-server (handles both with and without random suffix)
+                serverUrl = frontendUrl.replace(/tiktalk-busf[^.]*/i, 'tiktalk-server');
             } else if (frontendUrl.includes('onrender.com')) {
                 // Generic pattern: replace service name with tiktalk-server
                 // Extract service name and replace with tiktalk-server
                 const match = frontendUrl.match(/https?:\/\/([^.]+)\.onrender\.com/i);
                 if (match) {
-                    serverUrl = frontendUrl.replace(match[1], 'tiktalk-server');
+                    // If it's already tiktalk-server, use it; otherwise try to replace
+                    if (match[1].toLowerCase().includes('tiktalk')) {
+                        serverUrl = frontendUrl.replace(/[^.]*(?=\.onrender\.com)/i, 'tiktalk-server');
+                    } else {
+                        serverUrl = frontendUrl.replace(match[1], 'tiktalk-server');
+                    }
                 } else {
                     serverUrl = 'https://tiktalk-server.onrender.com';
                 }
@@ -71,11 +81,11 @@
         config: CONFIG
     });
     
-    // Show warning if using fallback
-    if (!MANUAL_SERVER_URL && serverUrl.includes('tiktalk-server.onrender.com')) {
-        console.warn('⚠️ WARNING: Using auto-detected server URL. If connection fails:');
-        console.warn('   1. Get your server URL from: Render Dashboard → TikTalk-Server → Copy URL');
-        console.warn('   2. Update MANUAL_SERVER_URL in config.js with your actual server URL');
+    // Show warning if using auto-detection (might fail if URLs have different suffixes)
+    if (!MANUAL_SERVER_URL || MANUAL_SERVER_URL.trim() === '') {
+        console.warn('⚠️ WARNING: Using auto-detected server URL.');
+        console.warn('   If connection fails, manually set MANUAL_SERVER_URL in config.js');
+        console.warn('   Get your URL from: Render Dashboard → TikTalk-Server → Copy URL');
     }
     
     // Test server connection immediately
@@ -88,7 +98,11 @@
         .catch(error => {
             console.error('❌ Server health check failed:', error);
             console.error('   Server URL being used:', serverUrl);
-            console.error('   Make sure the server is running and CORS is configured correctly');
+            console.error('   💡 TIP: Update MANUAL_SERVER_URL in config.js with your actual Render server URL');
+            console.error('   Make sure:');
+            console.error('   1. Server is running on Render');
+            console.error('   2. FRONTEND_URL is set in backend environment variables');
+            console.error('   3. CORS is configured correctly');
         });
 })();
 
