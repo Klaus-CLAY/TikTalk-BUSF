@@ -1,0 +1,21 @@
+services:
+  # WebSocket Server (Backend)
+  - type: web
+    name: tiktalk-server
+    env: node
+    buildCommand: cp package-server.json package.json && npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_URL
+        value: https://your-tiktalk-frontend.onrender.com  # ⚠️ UPDATE THIS with your actual frontend URL after deployment
+
+  # Frontend Static Site
+  - type: static
+    name: tiktalk
+    buildCommand: ""
+    staticPublishPath: .
+

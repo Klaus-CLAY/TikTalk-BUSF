@@ -1,0 +1,22 @@
+{
+  "name": "tiktalk",
+  "version": "2.0.0",
+  "description": "Modern random chat application for Bicol University students",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -o",
+    "dev": "npx http-server . -p 8080 -o --cors"
+  },
+  "keywords": [
+    "chat",
+    "random-chat",
+    "bicol-university",
+    "student-chat",
+    "anonymous-chat"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}
+
